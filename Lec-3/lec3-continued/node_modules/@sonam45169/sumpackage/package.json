@@ -1,0 +1,17 @@
+{
+  "name": "@sonam45169/sumpackage",
+  "version": "1.0.2",
+  "description": "\"package do nothing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sonam",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "hbs": "^4.2.0"
+  }
+}
