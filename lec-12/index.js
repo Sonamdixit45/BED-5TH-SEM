@@ -20,3 +20,5 @@ let backgroundColor = document.getElementById("colorPickerContainer");
             clearInterval(intervalId);
             intervalId = null;
         });
+
+        //how to send fetch requsst thorugh.. add new todo at server
