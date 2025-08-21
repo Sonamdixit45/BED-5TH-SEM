@@ -12,6 +12,10 @@ exports.createUser = async (req, res) => {
             data: newUser
         });
     } catch (err) {
+        // Duplicate email handling
+        if (err.code === 11000) {
+            return res.status(400).json({ success: false, message: "Email already exists" });
+        }
         res.status(500).json({ success: false, message: err.message });
     }
 };
@@ -34,10 +38,29 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
     try {
         let user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
         res.json({
             success: true,
             message: "User fetched successfully",
             data: user
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// Delete User
+exports.deleteUser = async (req, res) => {
+    try {
+        let deletedUser = await User.findByIdAndDelete(req.params.id);
+        if (!deletedUser) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        res.json({
+            success: true,
+            message: "User deleted successfully"
         });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });

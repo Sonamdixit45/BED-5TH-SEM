@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Blog App 🚀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🚀 Blog App with Users</h1>
+
+  <!-- User Section -->
+  <section id="users">
+    <h2>👤 Manage Users</h2>
+    <form id="userForm">
+      <input type="text" id="name" placeholder="Name" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Add User</button>
+    </form>
+    <h3>All Users</h3>
+    <div id="userList"></div>
+  </section>
+
+  <hr>
+
+  <!-- Blog Section -->
+  <section id="blogs">
+    <h2>📝 Manage Blogs</h2>
+    <form id="blogForm">
+      <input type="text" id="title" placeholder="Title" required>
+      <textarea id="body" placeholder="Blog content" required></textarea>
+      <input type="text" id="userId" placeholder="User ID" required>
+      <button type="submit">Add Blog</button>
+    </form>
+
+    <!-- Search & Filter -->
+    <div class="filters">
+      <input type="text" id="searchBlog" placeholder="🔍 Search blogs by title...">
+      <select id="sortBlogs">
+        <option value="newest">Sort by Newest</option>
+        <option value="oldest">Sort by Oldest</option>
+      </select>
+    </div>
+
+    <h3>All Blogs</h3>
+    <div id="blogList"></div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
