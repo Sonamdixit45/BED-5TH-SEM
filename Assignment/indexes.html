@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML target Attribute Demo</title>
+</head>
+<body>
+  <h1>HTML <code>target</code> Attribute Examples</h1>
+
+  <h2>1. Anchor Tag (<code>&lt;a&gt;</code>)</h2>
+  <p><a href="https://example.com" target="_self">Open in Same Tab (_self)</a></p>
+  <p><a href="https://example.com" target="_blank">Open in New Tab (_blank)</a></p>
+  <p><a href="https://example.com" target="_parent">Open in Parent Frame (_parent)</a></p>
+  <p><a href="https://example.com" target="_top">Open in Full Window (_top)</a></p>
+  <p><a href="https://example.com" target="myFrame">Open in Named Frame (myFrame)</a></p>
+
+  <h2>2. iFrame Example with Named Target</h2>
+  <iframe src="https://www.wikipedia.org" name="myFrame" width="400" height="200"></iframe>
+
+  <h2>3. Form Tag (<code>&lt;form&gt;</code>)</h2>
+  <form action="https://httpbin.org/get" method="get" target="_self">
+    <button type="submit">Submit in Same Tab (_self)</button>
+  </form>
+  <form action="https://httpbin.org/get" method="get" target="_blank">
+    <button type="submit">Submit in New Tab (_blank)</button>
+  </form>
+  <form action="https://httpbin.org/get" method="get" target="myFrame">
+    <button type="submit">Submit in Named Frame (myFrame)</button>
+  </form>
+
+  <h2>4. Base Tag (<code>&lt;base&gt;</code>)</h2>
+  <p>When using <code>&lt;base target="_blank"&gt;</code> in head, 
+  all links without target will open in a new tab.</p>
+
+  <!-- Example (uncomment to test globally) -->
+  <!--
+  <base target="_blank">
+  -->
+
+  <p><a href="https://www.google.com">Google (uses &lt;base&gt; if defined)</a></p>
+</body

@@ -1,0 +1,17 @@
+#colorpickerContainer {
+    padding-top: 70px;
+    padding-bottom: 70px;
+}
+
+
+
+.background-color {
+    background-color: #222222;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    font-size: 20px;
+    margin-top: 20px;
+    text-align: center;
+    border-radius: 10px;
+}
