@@ -1,103 +1,122 @@
-
-class OrderBook{
-    constructor(symbol){
-        this.symbol=symbol;
-        this.bids=[];
-        this.ask=[];
-        this.currentPrice=null;
-        this.trades=[];
+class OrderBook {
+    constructor(symbol) {
+        this.symbol = symbol;
+        this.bids = [];
+        this.ask = [];
+        this.currentPrice = null;
+        this.trades = [];
     }
+    // {
+    //     userId:
+    //     price:
+    //     quantity:
+    //     timestamp:
+    // }
 
-    //if a function start with underscore (_) it makes it private doesnt maqke it private actually
-     _sort(side){
-        if(side=="BUY"){
-            this.bids.sort((a,b)=>{
-                //a-b ascending order
-                //b-a descending order
-                if(a.price!=b.price){
-                   return  b.price-a.price
+
+    // if a function is prefixed with _ , it means its a private function (it doesnot make it private, there is no such thing it is just a convention)
+    _sort(side) {
+        if (side == "BUY") {
+            // this.bids.sort();   // lexicographical order by default
+            this.bids.sort((a, b) => {
+                if (a.price != b.price) {
+                    return b.price - a.price;   // descending order of price
                 }
-                return a.timeStamp-b.timeStamp;
-            }) //lexicographically by default in js
+                return a.timestamp - b.timestamp;  // ascending order of timestamp
+            });
         }
-        else {  //for SELL
-        this.ask.sort((a, b) => {
-            if (a.price !== b.price) {
-                return a.price - b.price; // ascending by price
-            }
-            return a.timeStamp - b.timeStamp; // earlier first
-        });
-      }
-    }
-
-
-    placeOrder(price,quantity,type,side,userName){
-        let newOrder={
-            symbol:this.symbol,
-            orderId: Math.floor(Math.random()*1000000),
-            side:side,
-            type:type,
-            price:price||null,
-            originalQty:quantity,
-            executedQty:0,
-            remainingQty:quantity,
-            user:userName,
-            timeStamp:Date.now(),
-        }
-        if(newOrder.type=="LIMIT"){
-            let result=this._LimitMatch(newOrder)
-            if(result.remainingQty>0){
-                if(result.side=="BUY"){
-                    this.bids.push(result)
-                }else{
-                    this.ask.push(result)
+        if (side == "SELL") {
+            this.ask.sort((a, b) => {
+                if (a.price != b.price) {
+                    return a.price - b.price;
                 }
-                this._sort(result.side)
-            }
-        }else{
-            let result=this._MarketMatch(newOrder)
+                return a.timestamp - b.timestamp;
+            })
         }
     }
 
-    _LimitMatch(order){
-        if(order.side=="BUY"){
-            //115 buy 10 qty, sell 110,111,115
-            let askArr=this.ask;
-            while(order.remainingQty>=0 && askArr.length>0){
-                let top=this.askArr[0];
-                if(top.price<=order.price){
-                    let buyQuantity=Math.min(top.quantity,order.quantity);
-                    //update -->order
-                    order.executedQty+=Number(buyQuantity);
-                    order.remainingQty-=Number(buyQuantity);
-                    //update top
-                    top.executedQty+=Number(buyQuantity);
-                    top.remainingQty-=Number(buyQuantity);
 
-                    if(top.remainingQty==0){
+    placeOrder(price, quantity, type, side, userName) {
+        let newOrder = {
+            symbol: this.symbol,
+            orderId: Math.floor(Math.random() * 1000000),
+            side: side,
+            type: type,
+            price: price || null,
+            originalQty: quantity,
+            executedQty: 0,
+            remainingQty: quantity,
+            user: userName,
+            timestamp: Date.now()
+        }
+        let trades = [];
+        if (newOrder.type == "LIMIT") {
+            let [order, trade] = this._LimitMatch(newOrder,trades);
+            if(trade) {
+                this.trades = [...this.trades,...trade];
+            }
+            if (order.remainingQty > 0) {
+                if (order.side == "BUY") {
+                    this.bids.push(order);
+                } else {
+                    this.ask.push(order)
+                }
+                this._sort(order.side);
+            }
+        } else {
+            let [order, trade] = this._MarketMatch(newOrder, trades);
+            if(trade) {
+                this.trades = [...this.trades,...trade];
+            }
+            if(order.remainingQty > 0) {
+                console.log("order completed : "+order.executedQty+" , order cancel : "+order.remainingQty);
+            } else {
+                console.log("order completed : "+order.executedQty);
+            }
+        }
+    }
+
+    _LimitMatch(order,trade) {
+        if (order.side == "BUY") {
+            let askArr = this.ask;
+            while (order.remainingQty > 0 && askArr.length > 0) {
+                let top = askArr[0];
+                if (top.price <= order.price) {
+                    let buyQuantity = Math.min(order.remainingQty, top.remainingQty);
+                    this.currentPrice = top.price;
+                    trade.push([buyQuantity,top.price]);
+                    // update --> order 
+                    order.executedQty += buyQuantity;
+                    order.remainingQty -= buyQuantity;
+                    //update --> top
+                    top.executedQty += buyQuantity;
+                    top.remainingQty -= buyQuantity;
+
+                    if (top.remainingQty == 0) {
                         askArr.shift();
                     }
                 }
-                else{
+                else {
                     break;
                 }
             }
-            return order;
+            return [order,trade];
         }
-        
-        else if(order.side == "SELL") {
+        else if (order.side == "SELL") {
             let bidArr = this.bids;
-            while(order.remainingQty > 0 && bidArr.length > 0) {
+            while (order.remainingQty > 0 && bidArr.length > 0) {
                 let top = bidArr[0];
-                if(top.price >= order.price) {
-                    let sellQuantity = Math.min(order.quantity , top.quantity);
+                if (top.price >= order.price) {
+                    let sellQuantity = Math.min(order.remainingQty, top.remainingQty);
+                    this.currentPrice = top.price;
+                    trade.push([sellQuantity,top.price]);
                     // update --> order
-                    order.executedQty += Number(sellQuantity);
-                    order.remainingQty -= Number(sellQuantity);
+                    order.executedQty += sellQuantity;
+                    order.remainingQty -= sellQuantity;
                     //update --> top
-                    top.executedQty -= Number(sellQuantity);
-                    top.remainingQty -= Number(sellQuantity);
-                    if(top.remainingQty == 0) {
+                    top.executedQty += sellQuantity;
+                    top.remainingQty -= sellQuantity;
+                    if (top.remainingQty == 0) {
                         bidArr.shift();
                     }
                 }
@@ -105,37 +124,107 @@ class OrderBook{
                     break;
                 }
             }
-            return order;
+            return [order, trade];
         }
-
-        else{
-            return "invalid order side"
+        else {
+            return "Invalid order side";
         }
     }
 
-    _MarketMatch(){
+    _MarketMatch(order,trade) {
+        // if it is buy, start buying from the start of ask array (best price)
+        if (order.side == "BUY") {
+            let askArr = this.ask;
+            while (order.remainingQty > 0 && askArr.length > 0) {
+                let top = askArr[0];
+                let buyQuantity = Math.min(order.remainingQty, top.remainingQty);
+                this.currentPrice = top.price;
+                    trade.push([buyQuantity,top.price]);
+                // update --> order
+                order.executedQty += buyQuantity;
+                order.remainingQty -= buyQuantity;
+                // update --> top
+                top.executedQty += buyQuantity;
+                top.remainingQty -= buyQuantity;
 
+                // remove fully filled SELL order
+                if (top.remainingQty == 0) {
+                    askArr.shift();
+                }
+            }
+            return [order, trade];
+        }
+
+        else if (order.side == "SELL") {
+            let bidArr = this.bids;
+            while (order.remainingQty > 0 && bidArr.length > 0) {
+                let top = bidArr[0]; 
+                let sellQuantity = Math.min(order.remainingQty, top.remainingQty);
+                this.currentPrice = top.price;
+                    trade.push([sellQuantity,top.price]);
+                // update --> order
+                order.executedQty += sellQuantity;
+                order.remainingQty -= sellQuantity;
+                // update --> top
+                top.executedQty += sellQuantity;
+                top.remainingQty -= sellQuantity;
+
+                if (top.remainingQty == 0) {
+                    bidArr.shift();
+                }
+            }
+            return [order, trade];
+        }
+
+        else {
+            return "Invalid order side";
+        }
+    }
+
+    getPrice() {
+        return this.currentPrice;
+    }
+
+    getBookSnapshot() {
+        return {
+            "ask" : this.ask.map((a) => [a.price, a.remainingQty]),
+            "bids" : this.bids.map((b) => [b.price, b.remainingQty])
+        }
+    }
+
+    getLatestTrade() {
+        return this.trades;
     }
 }
 
-let BTCUSDOrderBook=new OrderBook("BTC_USD");
-// BTCUSDOrderBook.bids.push({price:"100",quantity:10,type:"LIMIT",user:"Samiya"})
-// BTCUSDOrderBook.bids.push({price:"101",quantity:10,type:"LIMIT",user:"Sonam"})
-// BTCUSDOrderBook.bids.push({price:"99",quantity:10,type:"LIMIT",user:"yuvika"})
+let BTCUSDOrderBook = new OrderBook("BTC_USD");
+// BTCUSDOrderBook.bids.push({price:"100" , quantity:10 , type:"LIMIT" , user:"Yuvika"});
+// BTCUSDOrderBook.bids.push({price:"101" , quantity:10 , type:"LIMIT" , user:"Upasana"});
+// BTCUSDOrderBook.bids.push({price:"99" , quantity:10 , type:"LIMIT" , user:"Samiya"});
+
 // console.log(BTCUSDOrderBook);
 // BTCUSDOrderBook._sort("BUY");
-// console.log(BTCUSDOrderBook.bids);
-// BTCUSDOrderBook.ask.push({price:"101",quantity:5,type:"LIMIT",user:"Samiya"})
-// BTCUSDOrderBook.ask.push({price:"102",quantity:10,type:"LIMIT",user:"Samiya"})
-// BTCUSDOrderBook.ask.push({price:"110",quantity:5,type:"LIMIT",user:"Samiya"})
-// BTCUSDOrderBook._sort("SELL")
-// console.log(BTCUSDOrderBook)
 
-BTCUSDOrderBook.placeOrder("100",5,"LIMIT","BUY","Samiya");
-BTCUSDOrderBook.placeOrder("101",10,"LIMIT","BUY","Samiya");
-BTCUSDOrderBook.placeOrder("99",5,"LIMIT","BUY","Samiya");
-console.log(BTCUSDOrderBook);
-BTCUSDOrderBook.placeOrder("102",5,"LIMIT","SELL","Samiya");
-BTCUSDOrderBook.placeOrder("103",5,"LIMIT","SELL","Samiya");
-BTCUSDOrderBook.placeOrder("104",5,"LIMIT","SELL","Samiya");
-console.log(BTCUSDOrderBook)
+// BTCUSDOrderBook.ask.push({price:"101" , quantity:5 , type:"LIMIT" , user:"Yuvika"});
+// BTCUSDOrderBook.ask.push({price:"102" , quantity:10 , type:"LIMIT" , user:"Upasana"});
+// BTCUSDOrderBook.ask.push({price:"110" , quantity:10 , type:"LIMIT" , user:"Yuvika"});
+
+// BTCUSDOrderBook._sort("SELL");
+// console.log(BTCUSDOrderBook);
+
+
+BTCUSDOrderBook.placeOrder("100", 5, "LIMIT", "BUY", "Sonam");
+BTCUSDOrderBook.placeOrder("101", 10, "LIMIT", "BUY", "Sonam");
+BTCUSDOrderBook.placeOrder("99", 5, "LIMIT", "BUY", "Sonam");
+// console.log(BTCUSDOrderBook)
+BTCUSDOrderBook.placeOrder("102", 5, "LIMIT", "SELL", "Sonam");
+BTCUSDOrderBook.placeOrder("103", 5, "LIMIT", "SELL", "Sonam");
+BTCUSDOrderBook.placeOrder("104", 5, "LIMIT", "SELL", "Sonam");
+BTCUSDOrderBook.placeOrder("101", 3, "LIMIT", "SELL", "Sonam");
+// console.log(BTCUSDOrderBook)
+console.log(BTCUSDOrderBook.getPrice())
+BTCUSDOrderBook.placeOrder(null, 10, "MARKET", "BUY", "Sonam");
+console.log(BTCUSDOrderBook.getPrice())
+// console.log(BTCUSDOrderBook)
+console.log(BTCUSDOrderBook.getBookSnapshot())
+console.log(BTCUSDOrderBook.getLatestTrade())
