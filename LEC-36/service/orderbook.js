@@ -14,7 +14,7 @@ class OrderBook {
     // }
 
 
-    // if a function is prefixed with _ , it means its a private function (it doesnot make it private, there is no such thing it is just a convention)
+    // if a function is prefixed with _ , it means its a private function (it does not make it private, there is no such thing it is just a convention)
     _sort(side) {
         if (side == "BUY") {
             // this.bids.sort();   // lexicographical order by default
@@ -198,20 +198,19 @@ class OrderBook {
 }
 
 let BTCUSDOrderBook = new OrderBook("BTC_USD");
-// BTCUSDOrderBook.bids.push({price:"100" , quantity:10 , type:"LIMIT" , user:"Yuvika"});
-// BTCUSDOrderBook.bids.push({price:"101" , quantity:10 , type:"LIMIT" , user:"Upasana"});
+// BTCUSDOrderBook.bids.push({price:"100" , quantity:10 , type:"LIMIT" , user:"Samiya"});
+// BTCUSDOrderBook.bids.push({price:"101" , quantity:10 , type:"LIMIT" , user:"sonam"});
 // BTCUSDOrderBook.bids.push({price:"99" , quantity:10 , type:"LIMIT" , user:"Samiya"});
 
 // console.log(BTCUSDOrderBook);
 // BTCUSDOrderBook._sort("BUY");
 
-// BTCUSDOrderBook.ask.push({price:"101" , quantity:5 , type:"LIMIT" , user:"Yuvika"});
-// BTCUSDOrderBook.ask.push({price:"102" , quantity:10 , type:"LIMIT" , user:"Upasana"});
-// BTCUSDOrderBook.ask.push({price:"110" , quantity:10 , type:"LIMIT" , user:"Yuvika"});
+// BTCUSDOrderBook.ask.push({price:"101" , quantity:5 , type:"LIMIT" , user:"Samiya"});
+// BTCUSDOrderBook.ask.push({price:"102" , quantity:10 , type:"LIMIT" , user:"sonam"});
+// BTCUSDOrderBook.ask.push({price:"110" , quantity:10 , type:"LIMIT" , user:"Samiya"});
 
 // BTCUSDOrderBook._sort("SELL");
 // console.log(BTCUSDOrderBook);
-
 
 BTCUSDOrderBook.placeOrder("100", 5, "LIMIT", "BUY", "Sonam");
 BTCUSDOrderBook.placeOrder("101", 10, "LIMIT", "BUY", "Sonam");
