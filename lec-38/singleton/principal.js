@@ -1,28 +1,56 @@
-class Principal{
-    prncipalInstance = null;
-    _constructor(name){
-        this.name = name;
+// class principal{
+//     principalInstance=null;
+//     _constructor(name){
+//         this.name=name;
+//     }
+//     static getPrincipal(){
+//         if(!principalInstance){
+//             let principal=new principal("samiya");
+//             principalInstance=principal;
+//         }
+        
+//         return principalInstance;
+//     }
+
+//     resticateStudent(name){
+
+//     }
+//     suspend(name){
+
+//     }
+//     removeSuspension(name){
+
+//     }
+//     notify(message){
+
+//     }
+// }
+
+
+class principal{
+    principalInstance=new Map();
+    _constructor(school){
+        this.school=school;
     }
     static getPrincipal(){
-        if(!principalInstance){
-        let principal = new Principal("Sonam");
-        principalInstance = principal;
-    }
-        return principalInstance;
+        if(!principalInstance.get(school)){
+            let principal=new principal("school");
+            principalInstance.set(school,principal);
+        }
+        
+        return principalInstance.get(school);
     }
 
-    restigateStudent(name){
+    resticateStudent(name){
 
     }
-    suspend(){
+    suspend(name){
 
     }
-    removeSuspension(){
+    removeSuspension(name){
 
     }
     notify(message){
 
     }
 }
-
-module.exports = Principal;

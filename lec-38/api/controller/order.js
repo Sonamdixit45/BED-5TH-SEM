@@ -1,24 +1,19 @@
 const OrderBook = require("../service/orderbook");
-const ob = new OrderBook("BTCUSD");
+let { publisher } = require("../../shared/index.js");
 
-module.exports.postPlaceOrder = async(req, res) => {
+module.exports.postPlaceOrder = async (req, res) => {
+    let { price, quantity, type, side } = req.body;
+    let username = req.user.username;  // get from decoded token
 
-    //user,quantity,type,price,side,symbol
-    let {type,price,side,quantity,username} = req.body;
-    //basic validation
-    if(!type || !price || !side || !quantity || !username){
-        return res.status(400).json({
-            success:false,
-            message:"All fields are required"
-        });
+    // basic validation
+    if (!quantity || !type || !side) {
+        return res.json({ message: "Missing required fields" });
     }
 
-    let response =ob.placeOrder(price,quantity,type,side,username);
-    await publisher.connect();
-    await publisher.publish("book:update",JSON.stringify(response));
-//     //console.log(response);
-//     return res.json({
-//         success:true,
-//         data:response
-//     });
- }
+    // NOTE: No symbol needed
+    let response = OrderBook.placeOrder(price, quantity, type, side, username);
+
+    await publisher.PUBLISH("book:update", JSON.stringify(response.book));
+
+    res.json(response);
+};

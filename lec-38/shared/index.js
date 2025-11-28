@@ -1,19 +1,9 @@
-const { createClient } = require("redis");
+const {createClient} = require("redis");
 
-const publisher = createClient();
-const subscriber = createClient();
-
-publisher
-  .connect()
-  .then(() => console.log("Publisher connected to Redis"))
-  .catch((err) => console.error("Publisher connection error:", err));
-
-subscriber
-  .connect()
-  .then(() => console.log("Subscriber connected to Redis"))
-  .catch((err) => console.error("Subscriber connection error:", err));
+let publisher = createClient();
+let subscriber = createClient();
 
 module.exports = {
-  publisher,
-  subscriber,
+    publisher,
+    subscriber
 };
